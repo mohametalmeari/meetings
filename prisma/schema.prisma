@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Day {
+  id          String    @id @default(uuid())
+  userId      String
+  userName    String
+  date        DateTime
+  meetings    Meeting[]
+  maxMeetings String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Meeting {
+  id        String   @id @default(uuid())
+  dayId     String
+  day       Day      @relation(fields: [dayId], references: [id])
+  topic     String
+  startTime String
+  endTime   String
+  breakTime String
+  booking   Booking?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dayId])
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  meetingId String   @unique
+  meeting   Meeting  @relation(fields: [meetingId], references: [id])
+  guestName String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([meetingId])
+}
